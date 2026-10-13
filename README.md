@@ -17,7 +17,7 @@ limity, ne jako ručně broušený software.
 
 | Vrstva | Co dělá | Cena |
 |---|---|---|
-| `scripts/czech_forms_check.py` | každý token proti lexikonu 3,14M platných českých tvarů (aspell-cs); s `--negace` navíc deterministicky hlídá povinnou dvojí negaci | <1 s offline |
+| `scripts/czech_forms_check.py` | každý token proti lexikonu 3,14M platných českých tvarů (aspell-cs), výjimky z `allow.txt`; s `--negace` deterministicky hlídá povinnou dvojí negaci, s `--wiki` doplní frekvenci tvaru na cs.wikipedia (0× = výmysl modelu, ne termín) | <1 s offline, --wiki sítově |
 | `scripts/czech_grammar_critic.py` | druhý průchod lokálním modelem: shoda, pádové řízení, atributiva, kalibry záporu z angličtiny | ~2–8 s, jen to, co kontrolor nemůže |
 | `scripts/czech_lint_gate.py` | hook do Hermes `pre_tool_call`: blokuje zápis `.md`/`.txt`, dokud text neprošel oběma vrstvami | fail-closed |
 

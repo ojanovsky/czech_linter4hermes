@@ -37,9 +37,10 @@ Vypíše podezřelé tokeny jako `SLOVO\třádek:sloupec\tnávrhy: a, b, c` — 
 - ignoruje čísla; velikost písmen řeší dolováním; pomlčkové složeniny díl po dílu
 
 ### Workflow po nálezu
-1. Každý flagnutý tvar ověř proti zdroji (níže) — není to rodové jméno, citát, cizí termín nebo hovorový výraz?
-2. reálná chyba v tvaru → přepsat a znovu spustit, dokud exit 0
-3. cizí/vlastní termín (např. *vLLM*, *RAGFlow*) → ponechat, flag je planý poplach
+Flagnutý tvar má tři kategorie — rozhoduj dokladem, ne dojmem:
+1. překlep → návrh kontroloru sedí do kontextu → přepsat a znovu spustit, dokud exit 0
+2. cizí/technický termín (`vLLM`, *RAGFlow*) nebo vlastní jméno → ponechat; opakující se nálezy dej do `allow.txt` — čtou ji nyní i kontrolor, ne jen brána
+3. výmysl bez cizí stopy (český základ + česká koncovka, např. `odklapka` z 'flaps') — česky vypadající tvar není odborný termín jen proto, že vypadá česky; ani existence podobného slova v návrzích (monoskop) nic nedokazuje. Rozhodne frekvence výskytu: `czech_forms_check.py --wiki` přidá ke každému flagnutému tvaru štítek `wiki: N×` z cs.wikipedia (přesný dotaz na slovo; akronyma a camelCase se neptají). N=0 → výmysl → nahradit ustáleným názvem z článku na cs.wiki nebo ze SSČ, ponechat nelze. N>0 → termín existuje, ponechat a přidat do allow.txt. Měřeno 2026-10-13: odklapky 0×, ikonoskop 8×, Fowlerova 28×.
 
 ## Psaní rovnou pro bránu (memory, write_file/patch na *.md|*.txt)
 

@@ -1,19 +1,56 @@
 #!/usr/bin/env python3
 """Ověří české textové tvary proti rozbalené morphologické mřížce aspell-cs.
 
-Použití: czech_forms_check.py SOUBOR | text z stdin
+Použití: czech_forms_check.py [--negace] [--wiki] SOUBOR | text z stdin
 Výstup: jeden řádek na každý podezřelý token:
   'SLOVO\třádek:sloupec\tnávrhy: a, b, c'  (návrhy jsou reálné tvary z diktu)
+  s --wiki navíc štítek 'wiki: N×' — počet výskytů na cs.wikipedia; N=0 u tvaru
+  bez cizí stopy značí spíš halucinovaný výmysl než odborný termín
+Z allow.txt (sdílený s bránou) se vynechávají plané poplachy i zde.
 Návratový kód: 0 = vše ok, 1 = nalezeny neznámé tvary, 2 = chyba.
 """
 import difflib
+import json
 import re
 import sqlite3
 import sys
+import urllib.parse
+import urllib.request
 
 import os
 
 FORMS = os.path.expanduser("~/.local/share/czech-lint/cs.forms.sqlite")
+ALLOW_TXT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "allow.txt")
+
+
+def load_allow():
+    try:
+        with open(ALLOW_TXT, encoding="utf-8") as f:
+            return {l.strip().lower() for l in f if l.strip() and not l.startswith("#")}
+    except OSError:
+        return set()
+
+
+def _tech_stopa(word):
+    """Cizí/technická stopa: akronym (2+ velká písmena), camelCase, číslice.
+    Pouze první velké písmeno (Fowlerova) stopa není — ověřit wiki má smysl."""
+    upper = sum(c.isupper() for c in word)
+    return upper > 1 or any(c.isdigit() for c in word) or (upper == 1 and not word[0].isupper())
+
+
+def wiki_hits(word):
+    """Přesný dotaz na cs.wikipedia; None při nedostupnosti (offline běh)."""
+    params = urllib.parse.urlencode({
+        "action": "query", "list": "search", "srsearch": f'"{word}"',
+        "srlimit": 1, "format": "json"})
+    try:
+        req = urllib.request.Request(
+            "https://cs.wikipedia.org/w/api.php?" + params,
+            headers={"User-Agent": "czech-text-lint/1.0 (kontrola kvality textu)"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return json.load(r)["query"]["searchinfo"]["totalhits"]
+    except Exception:
+        return None
 
 
 class Forms:
@@ -97,12 +134,14 @@ def suggest(word, forms):
     return res
 
 
-def check_text(text, forms):
+def check_text(text, forms, allow=frozenset()):
     problems = []
     for lineno, line in enumerate(text.splitlines(), 1):
         for m in TOKEN_RE.finditer(line):
             word = m.group(0)
             low = word.lower()
+            if low in allow:
+                continue
             ok = low in forms
             # pomlčkové složeniny (např. 'ne-jsem') zkusit díl po dílu
             parts = [p for p in low.split("-") if p]
@@ -163,8 +202,9 @@ def _sentences(line):
 
 
 def main():
-    argv = [a for a in sys.argv[1:] if a != "--negace"]
+    argv = [a for a in sys.argv[1:] if a not in ("--negace", "--wiki")]
     neg_on = "--negace" in sys.argv[1:]
+    wiki_on = "--wiki" in sys.argv[1:]
     try:
         forms = Forms(FORMS)
     except sqlite3.Error as e:
@@ -178,9 +218,18 @@ def main():
             return 2
     else:
         text = sys.stdin.read()
-    problems = check_text(text, forms)
+    problems = check_text(text, forms, load_allow())
+    wiki_cache = {}
     for word, lineno, col, sug in problems:
         tail = "\tnávrhy: " + ", ".join(sug) if sug else "\tnávrhy: (žádný v distanci 2)"
+        if wiki_on and not _tech_stopa(word):
+            # bez cizí stopy -> dotaz na cs-wiki; akronyma/camelCase/digitální tokeny se neptají
+            low = word.lower()
+            if low not in wiki_cache:
+                wiki_cache[low] = wiki_hits(low)
+            h = wiki_cache[low]
+            tail += ("\twiki: nedostupné" if h is None else
+                     f"\twiki: {h}×" + (" — nikdo nepoužívá, ověř lemma!" if h == 0 else ""))
         print(f"{word}\t{lineno}:{col}{tail}")
     if neg_on:
         for lineno, col, sent in check_negation(text):

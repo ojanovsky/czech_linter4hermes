@@ -6,6 +6,15 @@ tokeny
 tokenu
 tokenů
 czochralského
+flag
+flaguje
+flagoval
+flagnutý
+flagnutá
+flagnuté
+flagnutého
+flagnutému
+flagnutých
 monokrystal
 monokrystalu
 monokrystalického
