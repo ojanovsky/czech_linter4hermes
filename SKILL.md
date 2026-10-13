@@ -49,6 +49,9 @@ Vypíše podezřelé tokeny jako `SLOVO\třádek:sloupec\tnávrhy: a, b, c` — 
 - Nahrazuješ-li starší záznam paměti (pořízený před bránou), musí nový text projít celý — hovorové tvary z originálu (`lézení`) při konsolidaci přepiš.
 - Zamítnutý zápis nezanechá částečný soubor: patch na soubor, který write_file nevytvořil, selže na čtení → oprav slova a přepiš soubor celý znovu.
 - Samotný text skillu podléhá bráně taky — záměrně chybné příklady piš vždy do uvozovek nebo do kódového formátování, kurzíva je nechrania.
+- Veřejné texty (README, doc) pouštěj bránou PŘED commitem — očekávej opakované zamítnutí vlastního textu: brána chytala chyby v našem README (chybějící čárka před vedlejší větou „jen to, co…“, pasivum složeného množného podmětu). Náraz do zdi znamená překlep v mém textu, nikoli vadnou bránu.
+- Řídká cizí slova a jejich tvary (`negační`, `repozitáře`) v aspell diktu nejsou → tvrdý flag; přepis na obecnější český ekvivalent nebo doplnění do `allow.txt`.
+- Adresář skillu je git repo s remote na GitHubu — po úpravě skriptů, SKILL.md i doc/ udělej commit a push; snapshot dokumentu v `doc/` se řídí pravidlem: zdroj pravdy je SilverBullet poznámka, git kopie je obecná veřejná verze bez strojových identifikátorů.
 
 ## Online ověřování významu a úzu (jen na vyžádání / po flagu)
 
@@ -66,7 +69,7 @@ Použij web_extract, jen když lokální kontrolor flagne slovo, u kterého nejs
 - **Brána `scripts/czech_lint_gate.py`:** SQLite lexikon `~/.local/share/czech-lint/cs.forms.sqlite` (64 MB, `INSERT` z .txt trvá 2 s, PRAGMA mmap 64 MB — rezidentní proces tak platí jen page cache, reclaimable; namísto frozenset 300+ MB). Třídí: znak mimo české písmo / tvar s diakritikou mimo lexikon / ASCII kořen+`orem|ourem|olem` = tvrdé; ASCII mimo lexikon = měkké (technický termín). Výjimky na plané poplachy: `~/.hermes/skills/czech-text-lint/allow.txt` (jméno na řádek, malými písmeny).
 - Consent: `~/.hermes/shell-hooks-allowlist.json` (event+command přesně); `hermes hooks doctor` ověří, `hermes hooks test pre_tool_call --payload-file X` spustí — v payload file se tool argumenty píší pod klíčem `args`, ne `tool_input` (mapování args→tool_input probíhá až při serializaci na drát). Změna configu nabíhá až v nové session.
 - Ochranu citaci u kritika nelze počítat jen z pozice `řádek:sloupec` — tu generuje model a bývá posunutá (naměřeno: sloupec 22 místo 35). `czech-doc-gate.py` to řeší funkcí `in_protected`: pokud text na pozici neodpovídá nálezu, projdou se všechny výskyty řetězce a u víceslovných nálezů i rozdílové tokeny mezi err a corr; chráněno jen když VŠECHNY výskyty sedí v citaci. Při testování hooku mimo `hermes hooks test` posílej payload s klíčem `tool_input` (ne `args` — ten mapuje až test runner).
-- Známa dira: přesměrování typu `echo … > subor.md` v `terminal` bránou projde — hook detekuje jen `curl --data-binary @soubor`, ne redis. Cílené zápisy (write_file, patch, PUT, skill_manage, memory) hlídány jsou.
+- Známa dira: přesměrování typu `echo … > soubor.md` v `terminal` bránou projde — hook detekuje jen `curl --data-binary @soubor`, ne redis. Stejně tak `open(..., "w")` uvnitř `execute_code`: hook visí na volání nástrojů, ne na Pythonu samotném. Dokumenty proto piš přes write_file/patch; zapisuješ-li přesto mimo hook (kernel, skript), ověř výsledek ručně oběma vrstvami (tvary + kritik) — zažito 2026-10-13 u snapshotu do doc/.
 
 ## Negation check
 
