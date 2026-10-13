@@ -30,4 +30,9 @@ for f in t1_kalibr t6_dash; do
 done
 python3 "$S/scripts/czech_grammar_critic.py" "$D/neg2.txt" >/dev/null 2>&1 \
   && echo "  POZOR kritik flagl korektní text" || echo "  OK  korektní text čistý"
+python3 "$S/scripts/czech_grammar_critic.py" "$D/t7_sporne_spatne.txt" 2>/dev/null | grep -q "\[5\]" \
+  && echo "  OK  kritik nalezl zakázanou kolokaci" \
+  || echo "  POZOR kritik nenašel sporné slovo (LLM nestabilita)"
+python3 "$S/scripts/czech_grammar_critic.py" "$D/t7_sporne_ok.txt" 2>/dev/null | grep -q "\[5\]" \
+  && echo "  POZOR kritik flagl legitimní kolokaci" || echo "  OK  legitimní kolokace čistá"
 exit $FAIL

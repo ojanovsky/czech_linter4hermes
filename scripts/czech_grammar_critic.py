@@ -12,21 +12,44 @@ import json
 import re
 import sys
 import urllib.request
+from pathlib import Path
 
 API = "http://127.0.0.1:8000/v1/chat/completions"
 MODEL = "q3.8-flash-next"
 MAX_CHARS = 12000  # délka textu na jeden request (kontrola KV usage)
+SPORNE = Path(__file__).resolve().parent.parent / "references" / "sporna-slova.md"
 
-SYSTEM = (
+SYSTEM_BASE = (
     "Jsi korektor češtiny. V zadaném textu hledej JEN tyto chyby:\n"
     "1) porušená shoda (podmět-přísudek, přídavné jméno-podstatné: rod/číslo/pád),\n"
     "2) chybné pádové řízení (sloveso, předložka),\n"
     "3) neshodné atributivní určení a rodově nesprávné zájmeno (např. 'kniha... jeho'),\n"
     "4) chybná negace: české negativní zájmeno (nikdy, nic, nikdo, nikde, nikam, nijak) musí být spojeno se ZÁPORNOU formou slovesa s předponou ne-. Sloveso bez ne- spolu s 'nikdy/nic' za ním je anglický kalibr z 'never/no' a je chybný: tvar 'VĚT se DĚLÁ nikdy' → správně 'VĚT se nikdy NEDĚLÁ' (sloveso v negaci). Posuzuj KAŽDOU větu/díl věty samostatně — i za pomlčkou nebo čárkou; kladné sloveso + nikdy v témž dílu je chyba, i když sousední díl obsahuje 'ne' nebo 'nikdy nemažou'. Věta s dvojí negací v témž dílu ('nikdo nic neztratil') je správně.\n"
-    "Nehledej: překlepy bez významu, styl, fakta, cizí slova, terminologii.\n"
-    'Vrať POUZE JSON pole objektů {"chyba": "...", "správně": "...", "typ": 1|2|3|4, "kde": "řádek:sloupec"}. '
+    "Nehledej: překlepy bez významu, styl, fakta, cizí slova, terminologii"
+    " (výjimkou je jen seznam z pravidla 5).\n"
+    'Vrať POUZE JSON pole objektů {"chyba": "...", "správně": "...", "typ": 1|2|3|4|5, "kde": "řádek:sloupec"}. '
     "Pokud nenajdeš nic, vrať []."
 )
+
+
+def _sporne_rule():
+    """Pravidlo 5 generované ze seznamu sporných slov; prázdný soubor = žádné pravidlo."""
+    try:
+        seznam = SPORNE.read_text(encoding="utf-8").strip()
+    except OSError:
+        seznam = ""
+    if not seznam:
+        return ""
+    return (
+        "5) sporná slova: seznam níže uvádí slova s zakázanými a legitimními kolokacemi.\n"
+        "   Flaguj (typ 5) POUZE výskyt padnoucí do zakázané kolokace; výskyt v legitimní\n"
+        "   kolokaci nebo jinde nijak neopravovat. Rozhoduj podle sousedních slov,\n"
+        "   ne podle pocitu. U každého nálezu uveď náhradu ze seznamu.\n"
+        "SEZNAM SPORNÝCH SLOV:\n" + seznam + "\n"
+    )
+
+
+SYSTEM = SYSTEM_BASE.replace("Vrať POUZE", _sporne_rule() + "\nVrať POUZE")
 
 
 def call(text):
