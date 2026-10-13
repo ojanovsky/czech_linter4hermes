@@ -115,3 +115,16 @@ Co se změnilo:
 Proč tu počítadlo slov stačí: pravidlo dvojí negace nezávisí na pořádku slov. Věty `Nikdy se to nedělá` i `Nedělá se to nikdy` mají tutéž nutnou podmínku — přítomnost záporu ve větě. Test nutné podmínky se obejde bez syntaktického rozboru a platí jen pro pravidla na pořádku nezávislá. Pravidla na pořádku závislá (shoda, řízení) potřebují znovu kritika. Škála jde od nejlevnějšího k nejchytřejšímu: počítadlo (0,1 ms) → morfologie (<1 s) → kritik (sekundy); každá vrstva hlídá to, co předchozí nemůže.
 
 Změřeno na reálných větách (tři opakování): deterministická vrstva zachytí kalibr spolehlivě, včetně případu za pomlčkou; kritik jej hlásí přibližně ze dvou třetin — jeho nález typu 4 je vodítko, nikoli rozsudek. Dvojí negace i věty s výjimkou `bez` zůstávají čisté, nálezy shody a řízení nedotčeny. Při ručním běhu kritik navíc vynechává příklady v backtickech a zahazuje nálezy, které se ve vstupu nevyskytují, i ty bez změny textu — obojí se objevilo při testech.
+
+## Sporná slova — seznam, ne odrážky (13. 10. 2026)
+
+Když opravuješ slovo, které je tvarově platné, ale bývá zaměňováno významově (rozchod ve smyslu uvedení do provozu), nepatří poučení do odrážky skillu. Patří do `references/sporna-slova.md` — kritik seznam načítá do svého promptu jako pravidlo 5, takže jím projde každý text, ne jen ty, kde agent skill zrovna četl.
+
+Tři úložiště podle toho, co je spatřeno:
+- `allow.txt` — slovo je v pořádku, jen ho dik nezná (planý poplach tvarový)
+- `references/sporna-slova.md` — slovo je platné, ale bývá zaměňováno významově
+- `SKILL.md` — pouze postupy a třídy poučení; slovní zásoba sem nepatří
+
+Formát záznamu: zakázané kolokace / legitimní významy / náhrada. Rozepsané kolokace jsou nutné — čistě sémantické zadání („posuzuj význam“, „nahraď a ověř smysl“) model na této mašině porušoval a flagoval i legitimní použití; po přepsání na konkrétní sousloví měřeno 3/3 záchyt, 0/3 planý poplach. Slabší model potřebuje vzor, ne úsudek.
+
+Postup při příští opravě slova: ověřit, že jde o záměnu významu (ne o planý poplach diktu) → přidat záznam do seznamu → ověřit kritikem na větě špatné i legitimní. Regrese: `tests/data/t7_sporne_spatne.txt` a `t7_sporne_ok.txt`.
