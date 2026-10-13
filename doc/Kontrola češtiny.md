@@ -2,7 +2,7 @@
 tags: [hermes, nástroje, čeština]
 ---
 a dej mi 
-# Kontrola češtiny — návod k rozchodu
+# Kontrola češtiny — návod ke zprovoznění
 
 Jak jsme v Hermesovi zprovoznili automatickou kontrolu českých tvarů a jak ji udržovat. Přišlo to na pochybení: model si vymýšlel hlavně přídavná jména („vakuumový“ → správně vakuový, „quitara“ → kytara, „rácovací“ → řádkovací) a paměťová poznámka na každé slovo je k ničemu — potřeba je generátor tvarů.
 

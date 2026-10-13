@@ -51,6 +51,7 @@ Vypíše podezřelé tokeny jako `SLOVO\třádek:sloupec\tnávrhy: a, b, c` — 
 - Samotný text skillu podléhá bráně taky — záměrně chybné příklady piš vždy do uvozovek nebo do kódového formátování, kurzíva je nechrania.
 - Veřejné texty (README, doc) pouštěj bránou PŘED commitem — očekávej opakované zamítnutí vlastního textu: brána chytala chyby v našem README (chybějící čárka před vedlejší větou „jen to, co…“, pasivum složeného množného podmětu). Náraz do zdi znamená překlep v mém textu, nikoli vadnou bránu.
 - Řídká cizí slova a jejich tvary (`negační`, `repozitáře`) v aspell diktu nejsou → tvrdý flag; přepis na obecnější český ekvivalent nebo doplnění do `allow.txt`.
+- Nepoužívej `rozchod` ve smyslu rozběhnutí/zprovoznění (uživatel opravil 2026-10-13) — `rozchod` znamená rozpor či odklon (rozcházející se větve). Pro uvedení do provozu piš `zprovoznění` nebo `rozběhnutí`.
 - Adresář skillu je git repo s remote na GitHubu — po úpravě skriptů, SKILL.md i doc/ udělej commit a push; snapshot dokumentu v `doc/` se řídí pravidlem: zdroj pravdy je SilverBullet poznámka, git kopie je obecná veřejná verze bez strojových identifikátorů.
 
 ## Online ověřování významu a úzu (jen na vyžádání / po flagu)

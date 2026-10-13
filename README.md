@@ -41,7 +41,7 @@ bash tests/run_tests.sh
 SKILL.md            návod pro agenty (načítá se do Hermesu jako dovednost)
 scripts/            kontrolor tvarů, kritik, brána
 tests/              regresní sada + testovací věty
-doc/                obsáhlejší návod k rozchodu a údržbě (snapshot)
+doc/                obsáhlejší návod ke zprovoznění a údržbě (snapshot)
 allow.txt           výjimky pro plané poplachy (vlastní jména, termíny)
 ```
 
