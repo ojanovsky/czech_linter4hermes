@@ -8,14 +8,14 @@ description: Use when producing or verifying Czech text — offline word-form ch
 ## Lokální tvarový kontrolor (offline, <1 s)
 
 ```
-python3 ~/.hermes/profiles/quido/skills/czech-text-lint/scripts/czech_forms_check.py SOUBOR
+python3 ~/.hermes/skills/czech-text-lint/scripts/czech_forms_check.py SOUBOR
 # nebo text na stdin
 ```
 
 ## Druhá vrstva: gramatický kritik (shoda, řízení)
 
 ```
-python3 ~/.hermes/profiles/quido/skills/czech-text-lint/scripts/czech_grammar_critic.py SOUBOR
+python3 ~/.hermes/skills/czech-text-lint/scripts/czech_grammar_critic.py SOUBOR
 ```
 
 - Druhý průchod přes lokální :8000 (q3.8-flash-next), temp 0.2, JSON nálezů — žádné nové RAM (stejné váhy). ~8 s na ~2,5 kB textu; čistý text odbaví za <1 s. Endpoint přepneš přes `CZECH_LINT_API` (výchozí `http://127.0.0.1:8000/v1`; pro serverovou vLLM nastav `http://10.193.1.181:8000/v1`).
@@ -66,11 +66,11 @@ Použij web_extract, jen když lokální kontrolor flagne slovo, u kterého nejs
 - **České odborné názvy cizích pojmů** (localizer → kurzový maják/lokalizér, glideslope → sestupový maják): obecné slovníky je neobsahují — ověřit na cs.wikipedia.org (článek k tématu). Flagnutý odborný termín ≠ chyba; halucinovaný výmysl (kluzáve) se nahradí ustáleným názvem z článku. Obsah textu piš z modelu, na web jen pro ověření termínu/čísla — user schvaluje jako křížovou kontrolu, ne jako zdroj pravdy.
 
 ## Aktivní vynucení — rozdělené vrstvy (Hermes hooks, nasazeno 2026-10-13 na tomto stroji)
-- **Chat (každá odpověď, <1 s):** plugin `~/.hermes/profiles/quido/plugins/czech-lint-chat/` na `transform_llm_output` — tvrdé nálezy připojí tag `⚠ Kontrola češtiny:` za odpověď, měkké jen log `$HERMES_HOME/logs/czech-lint-chat.log` (JSONL). Žádný model navíc. Kopie pro repozitář: `plugins/czech-lint-chat/` ve skillu. Bloky kódu, inline kód a URL se maskují.
+- **Chat (každá odpověď, <1 s):** plugin `~/.hermes/plugins/czech-lint-chat/` na `transform_llm_output` — tvrdé nálezy připojí tag `⚠ Kontrola češtiny:` za odpověď, měkké jen log `$HERMES_HOME/logs/czech-lint-chat.log` (JSONL). Žádný model navíc. Kopie pro repozitář: `plugins/czech-lint-chat/` ve skillu. Bloky kódu, inline kód a URL se maskují.
 - **Dokument (blokuje do čistého):** shell hook `pre_tool_call` → `~/.hermes/agent-hooks/czech-doc-gate.py` (config: hooks.pre_tool_call, matcher `write_file|patch|memory|terminal`, timeout 240, fail_closed false — lexikon/chybějící DB blokuje přes exit 2, nedostupný kritik pouští s varováním). Cílí write_file/patch na *.md|*.txt, memory operace a `curl --data-binary @soubor(.md|.txt)` / redirect do .md|.txt v terminalu. Obě vrstvy čtou text s vynechaným obsahem citací („…“, `…`, "…", '…'). Kopie ve skillu: `hooks/czech-doc-gate.py`.
 - **Test hooku:** `hermes hooks test pre_tool_call --payload-file X` — v payload souboru se argumenty píší pod klíčem `args` (ne `tool_input`). `hermes hooks doctor` ověří existenci, executable bit a allowlist. Změna configu nabíhá až v nové session. `CZECH_LINT_API` se v `hooks test` nenačítá z .env — exportuj ručně, live session ji má z .env profilu.
-- **Brána `scripts/czech_lint_gate.py`:** SQLite lexikon `~/.local/share/czech-lint/cs.forms.sqlite` (64 MB, `INSERT` z .txt trvá 2 s, PRAGMA mmap 64 MB — rezidentní proces tak platí jen page cache, reclaimable; namísto frozenset 300+ MB). Třídí: znak mimo české písmo / tvar s diakritikou mimo lexikon / ASCII kořen+`orem|ourem|olem` = tvrdé; ASCII mimo lexikon = měkké (technický termín). Výjimky na plané poplachy: `~/.hermes/profiles/quido/skills/czech-text-lint/allow.txt` (jméno na řádek, malými písmeny).
-- Consent: `~/.hermes/profiles/quido/shell-hooks-allowlist.json` (event+command přesně); na netty lze záznam napsat ručně s `approved_at` ISO, jinak TTY prompt při prvním startu.
+- **Brána `scripts/czech_lint_gate.py`:** SQLite lexikon `~/.local/share/czech-lint/cs.forms.sqlite` (64 MB, `INSERT` z .txt trvá 2 s, PRAGMA mmap 64 MB — rezidentní proces tak platí jen page cache, reclaimable; namísto frozenset 300+ MB). Třídí: znak mimo české písmo / tvar s diakritikou mimo lexikon / ASCII kořen+`orem|ourem|olem` = tvrdé; ASCII mimo lexikon = měkké (technický termín). Výjimky na plané poplachy: `~/.hermes/skills/czech-text-lint/allow.txt` (jméno na řádek, malými písmeny).
+- Consent: `~/.hermes/shell-hooks-allowlist.json` (event+command přesně); na netty lze záznam napsat ručně s `approved_at` ISO, jinak TTY prompt při prvním startu.
 - Ochranu citací implementovat maskováním obsahu na mezery (pozice, řádky i délka zůstávají), ne výběrem mimo citace — pozici `řádek:sloupec` generuje model a bývá posunutá; maskování je pozicově nezávislé a chrání obě vrstvy stejně.
 - Známa dira: `open(..., "w")` uvnitř `execute_code` bránou neprojde — hook visí na volání nástrojů, ne na Pythonu samotném. Přesměrování `echo … > soubor.md` v terminalu už detekována je (stejně tak curl -T/-d/--upload-file). Dokumenty proto piš přes write_file/patch; zapisuješ-li přesto mimo hook (kernel, skript), ověř výsledek ručně oběma vrstvami (tvary + kritik).
 

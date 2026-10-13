@@ -19,7 +19,7 @@ from pathlib import Path
 
 SKILL = Path(os.environ.get(
     "CZECH_LINT_SKILL",
-    os.path.expanduser("~/.hermes/profiles/quido/skills/czech-text-lint")))
+    os.path.expanduser("~/.hermes/skills/czech-text-lint")))
 GATE = SKILL / "scripts" / "czech_lint_gate.py"
 CRITIC = SKILL / "scripts" / "czech_grammar_critic.py"
 
