@@ -1,0 +1,1 @@
+Příklad: `zprávy se mažou nikdy` je špatně.

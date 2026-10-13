@@ -1,0 +1,12 @@
+# Výjimky z brány češtiny — jedno slovo na řádek, malými písmeny.
+# Sem dávat vlastní jména a termíny, které brána mylně blokuje jako tvar.
+ssč
+token
+tokeny
+tokenu
+tokenů
+czochralského
+monokrystal
+monokrystalu
+monokrystalického
+monokrystalické
