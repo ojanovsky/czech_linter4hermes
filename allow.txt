@@ -38,3 +38,5 @@ tlakovodní
 pákistán
 # oborový výraz: 0× dikce, cs-wiki zásahy výše (2026-10-13)
 lehkovodní
+# oborový výraz: 0× dikce, 33× cs-wiki (2026-10-13, text o LLM)
+konvoluční
