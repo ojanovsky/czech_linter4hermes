@@ -35,6 +35,9 @@ sort -u tvary.utf8 -o ~/.local/share/czech-lint/cs.forms.sorted.txt
 rm ~/.local/share/czech-lint/cs.forms.sqlite
 sqlite3 ~/.local/share/czech-lint/cs.forms.sqlite "CREATE TABLE forms(form TEXT PRIMARY KEY) WITHOUT ROWID;"
 sqlite3 ~/.local/share/czech-lint/cs.forms.sqlite ".import --csv ~/.local/share/czech-lint/cs.forms.sorted.txt forms"
+# naplnit meta.charset — znaková množina odvozená z dat (kontrolor i brána
+# ji čtou; ruční výčet písmen ve skriptech je jen fallback pro starou db)
+python3 -c "import sqlite3,os;p=os.path.expanduser('~/.local/share/czech-lint/cs.forms.sqlite');db=sqlite3.connect(p);ch=set();[ch.update(f.lower())for(f,)in db.execute('SELECT form FROM forms')];db.execute('CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT)');db.execute(\"INSERT OR REPLACE INTO meta VALUES('charset',?)\",(''.join(sorted(ch)),));db.commit()"
 ```
 
 Skript dělí text regulárním výrazem `re.compile(r"[^\W\d_]{2,}(?:-[^\W\d_]+)*")` — Unicode písmena; ručně psaná třída `[A-Za-z...]` lámala tokeny na diakritice a produkovala falešné hlášky (učeno z vlastní chyby). Kontrolor umí: velikost písmen (doluje), pomlčkové složeniny po částech, ignoruje číslice a pro každý nález nabídne nejbližší platné tvary (editace do vzdálenosti 2, s fonetickými přepisy q→k, w→v, x→ks; typicky zlomek vteřiny na slovo).

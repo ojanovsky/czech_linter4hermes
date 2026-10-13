@@ -23,8 +23,19 @@ MORPH_LEAK = ("orem", "ourem", "olem")
 
 class Gate:
     def __init__(self, db_path=FORMS_DB):
+        global CZECH, DIAC
         self.db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         self.db.execute("PRAGMA mmap_size=67108864")  # 64MB líné mapování
+        # znaky ze zdroje pravdy (meta.charset); ruční výčet je fallback —
+        # obě opakování chyb ručního výčtu zachytila právě tato data
+        try:
+            row = self.db.execute(
+                "SELECT value FROM meta WHERE key='charset'").fetchone()
+        except sqlite3.Error:
+            row = None
+        if row:
+            CZECH = set(row[0]) | {c.casefold() for c in row[0]}
+            DIAC = {c for c in CZECH if not c.isascii()}
         self.allow = set()
         if ALLOW_TXT.exists():
             self.allow = {l.strip().lower() for l in

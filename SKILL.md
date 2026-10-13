@@ -92,5 +92,7 @@ Použij web_extract, jen když lokální kontrolor flagne slovo, u kterého nejs
   rm ~/.local/share/czech-lint/cs.forms.sqlite
   sqlite3 ~/.local/share/czech-lint/cs.forms.sqlite "CREATE TABLE forms(form TEXT PRIMARY KEY) WITHOUT ROWID;"
   sqlite3 ~/.local/share/czech-lint/cs.forms.sqlite ".import --csv ~/.local/share/czech-lint/cs.forms.sorted.txt forms"
+  python3 -c "import sqlite3,os;p=os.path.expanduser('~/.local/share/czech-lint/cs.forms.sqlite');db=sqlite3.connect(p);ch=set();[ch.update(f.lower())for(f,)in db.execute('SELECT form FROM forms')];db.execute('CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT)');db.execute(\"INSERT OR REPLACE INTO meta VALUES('charset',?)\",(''.join(sorted(ch)),));db.commit()"
   ```
+  Poslední řádka staví `meta.charset` — znakovou množinu odvozenou z dat; kontrolor i brána ji čtou a ruční výčet písmen je jen fallback pro starou databázi (bez něj by se vracely chyby typu chybějící š).
   `.import --raw` tato verze sqlite3 nezná (unknown option) — `--csv` je pro tvary bez čárek bezpečné; po importu ověř `SELECT count(*)` a přítomnost tvaru s diakritikou. Nesnaž se o `aspell create master` bez roota — boří se přes chybějící .cset/.cmap v data-dir.

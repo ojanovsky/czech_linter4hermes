@@ -57,8 +57,18 @@ class Forms:
     """Množina tvarů přes mmap SQLite — do RAM neláduje nic (srov. gate)."""
 
     def __init__(self, path):
+        global ALPHA
         self.db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
         self.db.execute("PRAGMA mmap_size=67108864")  # 64MB líné mapování
+        # abeceda ze zdroje pravdy: znaky skutečně použité v lexikonu;
+        # ruční výčet ALPHA zůstává jen fallback pro databázi bez tabulky meta
+        try:
+            row = self.db.execute(
+                "SELECT value FROM meta WHERE key='charset'").fetchone()
+        except sqlite3.Error:
+            row = None
+        if row:
+            ALPHA = "".join(sorted(row[0]))
 
     def __contains__(self, word):
         return self.db.execute(
