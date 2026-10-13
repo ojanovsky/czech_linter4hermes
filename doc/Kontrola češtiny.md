@@ -22,12 +22,15 @@ Kritik je druhý průchod tvým vlastním modelem na :8000 (temp 0.2, myšlení 
 
 ## Jak to bylo realizováno (bez root oprávnění)
 
+Celý postup je skript `scripts/build_forms_db.sh` — stáhne dikt, rozbalí, převede, postaví SQLite a sám ověří počty. Ruční ekvivalent krok za krokem:
+
 ```bash
 # 1. stáhnout deb a rozbalit do dočasného adresáře
 apt-get download aspell-cs && dpkg -x aspell-cs*.deb dir
-# 2. uvnitř je usr/lib/aspell/cs.cwl = gzip(prezip-bin proud)
-#    POZOR: preunzip selže s 'unknown format' — nepoužívat!
-gunzip -c dir/usr/lib/aspell/cs.cwl | prezip-bin -d > tvary
+# 2. uvnitř je dikt — aktuální deb nese usr/share/aspell/cs.cwl.gz,
+#    starší měly usr/lib/aspell/cs.cwl; najít jistě: find dir -name 'cs.cwl*'
+#    (POZOR: preunzip selže 'unknown format', jen prezip-bin -d)
+gunzip -c "$(find dir -name 'cs.cwl*' | head -1)" | prezip-bin -d > tvary
 # 3. slovník je v ISO-8859-2
 iconv -f ISO-8859-2 -t UTF-8 tvary > tvary.utf8
 sort -u tvary.utf8 -o ~/.local/share/czech-lint/cs.forms.sorted.txt

@@ -70,6 +70,39 @@ def _critic_findings(text):
     return findings, True
 
 
+def _inline_echo_text(cmd):
+    """Text z jednoduchých `echo/printf '…' > soubor.(md|txt)` úseků příkazu.
+
+    Konzervativní: bereme jen úseky uvozovkami oddělené, kde je první slovo
+    přesně echo nebo printf, bez `$`, backtick a roury — cokoliv dynamického
+    raději nechat nedetekováno než blokovat legitimní příkaz (viz SKILL.md).
+    """
+    chunks = []
+    for seg in re.split(r"[;&|\n]+", cmd):
+        seg = seg.strip()
+        if not re.match(r"^(echo|printf)\s", seg):
+            continue
+        if "$" in seg or "`" in seg or "|" in seg:
+            continue
+        try:
+            toks = shlex.split(seg)
+        except ValueError:
+            continue
+        # přesměrování musí mířit na .md/.txt, jinak text nikam nepíše
+        if not re.search(r">{1,2}\s*\S*\.(?:md|txt)", seg):
+            continue
+        body = []
+        for t in toks[1:]:
+            if t.startswith(">"):                   # začátek přesměrování
+                break
+            if t.startswith("-") and len(t) <= 3:  # -n, -e…
+                continue
+            body.append(t)
+        if body:
+            chunks.append(" ".join(body))
+    return "\n".join(chunks) or None
+
+
 def _extract(payload):
     """-> list[(path, full_text_or_None, new_text)]. full None = kontroluj jen new_text (patch)."""
     tool = payload.get("tool_name")
@@ -104,10 +137,13 @@ def _extract(payload):
                 f = m.group(1).strip('"')
                 files.add(f if f.startswith(("/", "~", "$HOME")) else
                           os.path.join(os.getcwd(), f))
+        inline = _inline_echo_text(cmd) if files else None
         for f in files:
             p = Path(os.path.expandvars(os.path.expanduser(f)))
             if p.is_file():
                 out.append((str(p), None, None))  # čti soubor ze disku
+            elif inline:
+                out.append((str(p), inline, None))  # nový soubor: tělo echo/printf
     return out
 
 
