@@ -24,3 +24,17 @@ jednoštěrbinová
 dvouštěrbinová
 trojštěrbinová
 krügerova
+# země a místa mimo aspell-cs dikc (2026-10-13, kontrola textu o reaktorech)
+čína
+švédsko
+německu
+německo
+temelín
+černobyl
+černobylu
+superphénix
+# oborový výraz: 0× v dikci, 214× cs-wiki (2026-10-13)
+tlakovodní
+pákistán
+# oborový výraz: 0× dikce, cs-wiki zásahy výše (2026-10-13)
+lehkovodní

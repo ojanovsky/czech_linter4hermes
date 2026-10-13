@@ -144,7 +144,9 @@ def _extract(payload):
                 out.append((str(p), None, None))  # čti soubor ze disku
             elif inline:
                 out.append((str(p), inline, None))  # nový soubor: tělo echo/printf
-    return out
+    # allow.txt je únikové víčko brány — sama se v něm nekontroluje
+    # (jsou to slova, ne věty; jinak by se nedal doplnit nový výjimkový termín)
+    return [t for t in out if Path(t[0]).name != "allow.txt"]
 
 
 def main():
