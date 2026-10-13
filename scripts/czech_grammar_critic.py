@@ -9,12 +9,15 @@ Použití: czech_grammar_critic.py SOUBOR | text z stdin
 Výstup: JSON čtenářsky přehledný řádky; exit 0 žádné nálezy, 1 nalezeno, 2 chyba.
 """
 import json
+import os
 import re
 import sys
 import urllib.request
 from pathlib import Path
 
-API = "http://127.0.0.1:8000/v1/chat/completions"
+API = os.environ.get("CZECH_LINT_API", "http://127.0.0.1:8000/v1/chat/completions").rstrip("/")
+if not API.endswith("/chat/completions"):
+    API += "/chat/completions"
 MODEL = "q3.8-flash-next"
 MAX_CHARS = 12000  # délka textu na jeden request (kontrola KV usage)
 SPORNE = Path(__file__).resolve().parent.parent / "references" / "sporna-slova.md"

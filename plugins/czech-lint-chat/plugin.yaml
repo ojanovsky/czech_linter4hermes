@@ -1,0 +1,6 @@
+name: czech-lint-chat
+version: 1.0.0
+description: "Kontrola češtiny v odpovědích: tvrdé tvarové nálezy připnou varovný štítek za text, měkké se logují mlčky do JSONL. Bez modelu navíc."
+author: "ojanovsky (ported from czech_linter4hermes)"
+provides_hooks:
+  - transform_llm_output
