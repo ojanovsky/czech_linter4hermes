@@ -67,7 +67,7 @@ class Forms:
 TOKEN_RE = re.compile(r"[^\W\d_]{2,}(?:-[^\W\d_]+)*", re.UNICODE)
 
 # abeceda pro editaci: běžná písmena; fonetické záměny řeší předpis (_variants)
-ALPHA = "abcdefghijklmnopqrstuvwxyzábcčdďeéěfghiíjklmnňoopqrŕřsstťuúůvwyýzž"
+ALPHA = "abcdefghijklmnopqrstuvwxyzábcčdďeéěfghiíjklmnňoopqrŕřsstťuúůvwyýzžšó"
 PHON = [("q", "k"), ("w", "v"), ("x", "ks")]
 MAX_SUGG = 5
 BRANCH = 400         # kolik kandidátů 1. úrovně rozvětvit do 2. úrovně

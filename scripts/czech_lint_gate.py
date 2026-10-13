@@ -15,7 +15,7 @@ import os as _os
 FORMS_DB = _os.path.expanduser("~/.local/share/czech-lint/cs.forms.sqlite")
 ALLOW_TXT = Path(__file__).resolve().parent.parent / "allow.txt"
 TOKEN_RE = re.compile(r"[^\W\d_]{2,}(?:-[^\W\d_]+)*", re.UNICODE)
-CZECH = set("abcdefghijklmnopqrstuvwxyzábcčdďeéěfghiíjklmnňoňopqrŕřsstťuúůvwýyzž")
+CZECH = set("abcdefghijklmnopqrstuvwxyzábcčdďeéěfghiíjklmnňoňopqŕřsstťuúůvwýyzžšó")
 DIAC = CZECH - set("abcdefghijklmnopqrstuvwxyz")
 # halucinační instrumentály: ASCII kořen + česká přípona, kterou lexikon nezná
 MORPH_LEAK = ("orem", "ourem", "olem")

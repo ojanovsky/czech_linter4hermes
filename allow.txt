@@ -19,3 +19,8 @@ monokrystal
 monokrystalu
 monokrystalického
 monokrystalické
+odklápěcí
+jednoštěrbinová
+dvouštěrbinová
+trojštěrbinová
+krügerova
