@@ -10,7 +10,9 @@ import re
 import sqlite3
 from pathlib import Path
 
-FORMS_DB = "/home/oja/.local/share/czech-lint/cs.forms.sqlite"
+import os as _os
+
+FORMS_DB = _os.path.expanduser("~/.local/share/czech-lint/cs.forms.sqlite")
 ALLOW_TXT = Path(__file__).resolve().parent.parent / "allow.txt"
 TOKEN_RE = re.compile(r"[^\W\d_]{2,}(?:-[^\W\d_]+)*", re.UNICODE)
 CZECH = set("abcdefghijklmnopqrstuvwxyzábcčdďeéěfghiíjklmnňoňopqrŕřsstťuúůvwýyzž")

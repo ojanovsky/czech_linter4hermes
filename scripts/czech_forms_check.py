@@ -11,7 +11,9 @@ import re
 import sqlite3
 import sys
 
-FORMS = "/home/oja/.local/share/czech-lint/cs.forms.sqlite"
+import os
+
+FORMS = os.path.expanduser("~/.local/share/czech-lint/cs.forms.sqlite")
 
 
 class Forms:
