@@ -40,3 +40,8 @@ pákistán
 lehkovodní
 # oborový výraz: 0× dikce, 33× cs-wiki (2026-10-13, text o LLM)
 konvoluční
+# technické výpůjčky hojně užívané v češtině (0× dikce aspell, běžné v IT kontextu)
+newsletter
+podcast
+podcastech
+self-help
