@@ -11,3 +11,12 @@ Formát záznamu: slovo; zakázané kolokace (vzory, kde je výskyt chyba); legi
 - Legitimní významy (NEFLAGOVAT): rozcházející se větve, rozchod názorů, rozchod cest,
   jejichž náhrada za zprovoznění/rozběhnutí nedává smysl.
 - Náhrada: zprovoznění, rozběhnutí.
+
+## povrch
+
+- Zakázané kolokace (chyba): `žádný povrch`, `mezi povrchy`, `každý povrch`, `povrch aplikace`,
+  `napříč povrchy` — vždy ve smyslu klientského rozhraní systému (anglické "surface").
+  Uživatel označil překlad "povrch" za krkolomný (2026-11-10).
+- Legitimní významy (NEFLAGOVAT): fyzický povrch — povrch stolu, povrchová úprava,
+  povrch planety; cokoliv, kde náhrada za klient/rozhraní nedává smysl.
+- Náhrada: klient, rozhraní.
