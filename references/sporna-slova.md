@@ -20,3 +20,10 @@ Formát záznamu: slovo; zakázané kolokace (vzory, kde je výskyt chyba); legi
 - Legitimní významy (NEFLAGOVAT): fyzický povrch — povrch stolu, povrchová úprava,
   povrch planety; cokoliv, kde náhrada za klient/rozhraní nedává smysl.
 - Náhrada: klient, rozhraní.
+
+## dozjezd
+
+- Zakázané kolokace (chyba): `dozjezdy`, `dozjezd pohonu`, `rozjezdy a dozjezdy` —
+  ve smyslu doběhu/regulovaného zpomalení pohonu. Uživatel opravil na dojezd (2026-11-19).
+- Legitimní významy (NEFLAGOVAT): žádné časté — tvar v technické češtině nepoužívat.
+- Náhrada: dojezd, případně doběh u setrvačné fáze.

@@ -45,3 +45,12 @@ newsletter
 podcast
 podcastech
 self-help
+bin
+# bězný IT výraz (spouštěcí soubor programu), 0× dikce aspell
+binárka
+binárku
+binárky
+diff
+θ
+ω
+µs
